@@ -22,7 +22,6 @@ import net.minecraft.world.World;
 public class BlockLeafAir extends BlockAir {
     public static final PropertyEnum<BlockProperties.EnumType> TYPE = PropertyEnum.create("type", BlockProperties.EnumType.class);
     final int META_OFFSET = 5;
-    int[] surroundings;
 
     public BlockLeafAir() {
         super();
@@ -54,111 +53,6 @@ public class BlockLeafAir extends BlockAir {
         return new BlockStateContainer(this, TYPE);
     }
   
-    // TODO: why doesn't code from BlockLeaves#updateTick work?
-    // This is broken - always returns false
-    protected boolean canLeavesBeSustainedAtPos(World worldIn, BlockPos pos, IBlockState state)
-    {
-        boolean leavesCanGrow = !ConfigurationHandler.generalSettings.growOutward;
-        
-        if (leavesCanGrow) {
-        	return leavesCanGrow;
-        }
-    
-        // copied from BlockLeaves#updateTick, unfortunately
-	    int k = pos.getX();
-	    int l = pos.getY();
-	    int i1 = pos.getZ();
-	
-	    if (this.surroundings == null)
-	    {
-	        this.surroundings = new int[32768];
-	    }
-	
-	    if (!worldIn.isAreaLoaded(pos, 1)) return false; // Forge: prevent decaying leaves from updating neighbors and loading unloaded chunks
-	    if (worldIn.isAreaLoaded(pos, 6)) // Forge: extend range from 5 to 6 to account for neighbor checks in world.markAndNotifyBlock -> world.updateObservingBlocksAt
-	    {
-	        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-	
-	        for (int i2 = -4; i2 <= 4; ++i2)
-	        {
-	            for (int j2 = -4; j2 <= 4; ++j2)
-	            {
-	                for (int k2 = -4; k2 <= 4; ++k2)
-	                {
-	                    IBlockState iblockstate = worldIn.getBlockState(blockpos$mutableblockpos.setPos(k + i2, l + j2, i1 + k2));
-	                    Block block = iblockstate.getBlock();
-	
-	                    if (!block.canSustainLeaves(iblockstate, worldIn, blockpos$mutableblockpos.setPos(k + i2, l + j2, i1 + k2)))
-	                    {
-	                    	blockpos$mutableblockpos.setPos(k + i2, l + j2, i1 + k2);
-	                        if (block.isLeaves(iblockstate, worldIn, blockpos$mutableblockpos) || (pos == blockpos$mutableblockpos))
-	                        {
-	                            this.surroundings[(i2 + 16) * 1024 + (j2 + 16) * 32 + k2 + 16] = -2;
-	                        }
-	                        else
-	                        {
-	                            this.surroundings[(i2 + 16) * 1024 + (j2 + 16) * 32 + k2 + 16] = -1;
-	                        }
-	                    }
-	                    else
-	                    {
-	                        this.surroundings[(i2 + 16) * 1024 + (j2 + 16) * 32 + k2 + 16] = 0;
-	                    }
-	                }
-	            }
-	        }
-	
-	        for (int i3 = 1; i3 <= 4; ++i3)
-	        {
-	            for (int j3 = -4; j3 <= 4; ++j3)
-	            {
-	                for (int k3 = -4; k3 <= 4; ++k3)
-	                {
-	                    for (int l3 = -4; l3 <= 4; ++l3)
-	                    {
-	                        if (this.surroundings[(j3 + 16) * 1024 + (k3 + 16) * 32 + l3 + 16] == i3 - 1)
-	                        {
-	                            if (this.surroundings[(j3 + 16 - 1) * 1024 + (k3 + 16) * 32 + l3 + 16] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16 - 1) * 1024 + (k3 + 16) * 32 + l3 + 16] = i3;
-	                            }
-	
-	                            if (this.surroundings[(j3 + 16 + 1) * 1024 + (k3 + 16) * 32 + l3 + 16] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16 + 1) * 1024 + (k3 + 16) * 32 + l3 + 16] = i3;
-	                            }
-	
-	                            if (this.surroundings[(j3 + 16) * 1024 + (k3 + 16 - 1) * 32 + l3 + 16] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16) * 1024 + (k3 + 16 - 1) * 32 + l3 + 16] = i3;
-	                            }
-	
-	                            if (this.surroundings[(j3 + 16) * 1024 + (k3 + 16 + 1) * 32 + l3 + 16] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16) * 1024 + (k3 + 16 + 1) * 32 + l3 + 16] = i3;
-	                            }
-	
-	                            if (this.surroundings[(j3 + 16) * 1024 + (k3 + 16) * 32 + (l3 + 16 - 1)] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16) * 1024 + (k3 + 16) * 32 + (l3 + 16 - 1)] = i3;
-	                            }
-	
-	                            if (this.surroundings[(j3 + 16) * 1024 + (k3 + 16) * 32 + l3 + 16 + 1] == -2)
-	                            {
-	                                this.surroundings[(j3 + 16) * 1024 + (k3 + 16) * 32 + l3 + 16 + 1] = i3;
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	    }
-	
-	    int l2 = this.surroundings[16912];
-	
-	    return (l2 >= 0);
-     }
-    
     protected boolean canLeavesGrowAtLocation(World worldIn, BlockPos pos, IBlockState state) {
         boolean leavesCanGrow = !ConfigurationHandler.generalSettings.growOutward;
         
