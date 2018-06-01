@@ -16,8 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = Reference.MOD_ID)
 public class ConfigurationHandler
 {
-	@Name("General Settings")
-    @Config.Comment("General regrow settings")
+	@Name(value = "General Settings")
+    @Config.Comment(value = "General regrow settings")
     public static final GeneralSettings generalSettings = new GeneralSettings();
 
     public static class GeneralSettings
@@ -31,6 +31,10 @@ public class ConfigurationHandler
         @Config.Comment("Light level required for leaves to start regrowing. 0 = no light required.")
     	@RangeInt(min = 0, max = 13)
         public int lightRequiredToGrow = 4; // 0-13
+    	
+    	@Name("Grow outward")
+        @Config.Comment("Must leaves grow next to other leaves or logs (aka \"can sustain leaves\") to regrow")
+        public boolean growOutward = false;
         
     	@Name("Debug mode")
         @Config.Comment("Enable this to show blocks and output debug text into console.")

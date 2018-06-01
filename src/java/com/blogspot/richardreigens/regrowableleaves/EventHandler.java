@@ -40,6 +40,7 @@ public class EventHandler {
             if (player.getHeldItemMainhand().isEmpty() || player.getHeldItemMainhand().getItem() != Items.SHEARS) {
                 //Minecraft Leaves
             	// TODO: consider converting "== Blocks.LEAVES" to "instanceof BlockLeavesBase"
+            	// TODO: consider Block#isLeaves method like https://github.com/lumien231/QuickLeafDecay/blob/master/src/main/java/lumien/quickleafdecay/QuickLeafDecay.java
                 if (block == Blocks.LEAVES) {
                     if (ConfigurationHandler.generalSettings.debugMode) LogHelper.info("Minecraft leaves");
                     block.harvestBlock(world, player, pos, state, null, ItemStack.EMPTY);
