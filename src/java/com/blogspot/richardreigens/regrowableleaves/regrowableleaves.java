@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class regrowableleaves {
     @Mod.Instance(Reference.MOD_ID)
     public static regrowableleaves instance;
-    public static boolean isBOPInstalled;
 	public static Logger logger;
 
     @Mod.EventHandler
