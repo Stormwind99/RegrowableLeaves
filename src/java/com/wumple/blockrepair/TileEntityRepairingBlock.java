@@ -30,7 +30,7 @@ public class TileEntityRepairingBlock extends TileEntity
     private long timeToRepairAt = 0;
     
     protected static void dbg(Object obj) {
-    	
+    	BlockRepair.logger.log(org.apache.logging.log4j.Level.DEBUG, obj);
     }
     
     protected static boolean useLoggingDebug() {
