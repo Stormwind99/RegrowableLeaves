@@ -13,10 +13,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BlockRepair {
     @Mod.Instance(Reference.MOD_ID)
     public static BlockRepair instance;
+    
 	public static Logger logger;
-	
-    @SidedProxy(clientSide = "com.wumple.blockrepair.CommonProxy", serverSide = "com.wumple.blockrepair.CommonProxy")
-    public static CommonProxy proxy;
+	public static BlockRepairManager proxy = new BlockRepairManager();
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {

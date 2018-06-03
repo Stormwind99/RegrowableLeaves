@@ -9,10 +9,11 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.google.common.reflect.TypeToken;
+
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
@@ -30,7 +31,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockRepairingBlock extends BlockContainer
+public class BlockRepairingBlock  extends BlockContainer
 {
 	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
@@ -103,12 +104,12 @@ public class BlockRepairingBlock extends BlockContainer
     public boolean isFullCube(IBlockState state)
     {
         return false;/*super.isFullCube(state);*/
-    }
-
+    }   
+     
     @Override
-    public TileEntity createNewTileEntity(World var1, int meta)
+    public TileEntity createNewTileEntity(World var1, int meta) 
     {
-        return new TileEntityRepairingBlock();
+    	return new TileEntityRepairingBlock();
     }
 
     @Override
@@ -166,23 +167,13 @@ public class BlockRepairingBlock extends BlockContainer
         return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
-    @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
-    {
-        if (world.isRemote) return;
-
-        TileEntity tEnt = world.getTileEntity(pos);
-        if (tEnt instanceof TileEntityRepairingBlock) {
-            ((TileEntityRepairingBlock) tEnt).updateScheduledTick();
-        }
-        world.scheduleBlockUpdate(pos, this, 20*30, 1);
-    }
-
+    /*
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
         //super.onBlockAdded(worldIn, pos, state);
         worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
     }
+    */
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
