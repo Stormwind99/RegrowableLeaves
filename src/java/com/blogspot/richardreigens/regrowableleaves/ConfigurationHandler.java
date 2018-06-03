@@ -22,21 +22,21 @@ public class ConfigurationHandler
     public static class GeneralSettings
     {
     	@Name("Leaf regrow rate")
-        @Config.Comment("Rate that leaves will regrow. Lower number is faster.")
-    	@RangeInt(min = 0, max = 10)
-        public int leafRegrowthRate = 3;  // 0-10
+        @Config.Comment("Time leaves take to regrow on average, in seconds.")
+    	@RangeInt(min = 0)
+        public int leafRegrowthRate = 180;
 
     	@Name("Light required to grow")
         @Config.Comment("Light level required for leaves to start regrowing. 0 = no light required.")
-    	@RangeInt(min = 0, max = 13)
-        public int lightRequiredToGrow = 4; // 0-13
+    	@RangeInt(min = 0, max = 15)
+        public int lightRequiredToGrow = 9;
     	
     	@Name("Grow outward")
         @Config.Comment("Must leaves grow next to other leaves or logs (aka \"can sustain leaves\") to regrow")
         public boolean growOutward = false;
         
     	@Name("Debug mode")
-        @Config.Comment("Enable this to show blocks and output debug text into console.")
+        @Config.Comment("Enable this to show blocks and other debugging help.")
         public boolean debugMode = false;
     }
 
