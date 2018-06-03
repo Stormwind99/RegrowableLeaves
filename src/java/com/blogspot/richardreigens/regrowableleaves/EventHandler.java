@@ -2,8 +2,8 @@ package com.blogspot.richardreigens.regrowableleaves;
 
 import java.util.Random;
 
-import CoroUtil.block.TileEntityRepairingBlock;
-import CoroUtil.util.UtilMining;
+import com.wumple.blockrepair.TileEntityRepairingBlock;
+import com.wumple.blockrepair.BlockRepairingBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
@@ -34,8 +34,8 @@ public class EventHandler {
             //Output for debug text.
             if (ConfigurationHandler.generalSettings.debugMode) {
                 LogHelper.info("Block: " + block);
-                LogHelper.info("State: " + state);
-                LogHelper.info("State from Meta: " + state.getBlock().getMetaFromState(state));
+                //LogHelper.info("State: " + state);
+                //LogHelper.info("State from Meta: " + state.getBlock().getMetaFromState(state));
             }
 
             // only regrow if leaves broke with empty hand or tool other than shears
@@ -45,7 +45,7 @@ public class EventHandler {
                     if (ConfigurationHandler.generalSettings.debugMode) LogHelper.info("Breaking leaves");
                     
                     // BEGIN
-                    if (UtilMining.canConvertToRepairingBlock(world, state)) {
+                    if (BlockRepairingBlock.canConvertToRepairingBlock(world, state)) {
 						TileEntityRepairingBlock.replaceBlockAndBackup(world, pos, 20*10);
 					} else {
 						LogHelper.info("cant use repairing block on: " + state);
