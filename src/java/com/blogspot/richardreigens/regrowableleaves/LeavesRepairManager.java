@@ -11,17 +11,17 @@ import net.minecraft.block.material.Material;
 public class LeavesRepairManager extends BlockRepairManager {
 
 	@Override
-    public BlockBlank BlockBlankFactory() {
+    protected BlockBlank BlockBlankFactory() {
     	return new BlockBlank(Material.AIR);
     }
     
 	@Override
-    public BlockRepairingBlock BlockRepairingBlockFactory() {
+	protected BlockRepairingBlock BlockRepairingBlockFactory() {
     	return new BlockLeavesRepairingBlock();
     }
     
 	@Override
-    public Class TileEntityRepairingBlockClass() {
+	protected Class TileEntityRepairingBlockClass() {
     	return TileEntityLeavesRepairingBlock.class;
 	}
 	

@@ -32,7 +32,7 @@ public class TileEntityLeavesRepairingBlock extends TileEntityRepairingBlock {
 	}
 
 	@Override
-	public boolean canRepairBlock() {
+	protected boolean canRepairBlock() {
 		return (
 				super.canRepairBlock()
 				&& getWorld().isAreaLoaded(getPos(), 1)
@@ -42,8 +42,9 @@ public class TileEntityLeavesRepairingBlock extends TileEntityRepairingBlock {
 	}
 
 	@Override
-	public void onCantRepairBlock() {
+	protected void onCantRepairBlock() {
     	super.onCantRepairBlock();
+    	// try again later
     	setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
     }
 }

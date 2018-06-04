@@ -33,21 +33,12 @@ public class BlockRepairingBlock  extends BlockContainer
 {
 	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
-	
-    public static boolean canConvertToRepairingBlock(World world, IBlockState state) {
-		//should cover most all types we dont want to put into repairing state
-		if (!state.isFullCube()) {
-			return false;
-		}
-		return true;
-	}
     
     public BlockRepairingBlock()
     {
         super(Material.PLANTS);
         //stone, fallback default
         setHardness(1.5F);
-        //this.setTickRandomly(true);
     }
 
     @Nullable
@@ -71,16 +62,19 @@ public class BlockRepairingBlock  extends BlockContainer
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
     	/*
-        //special behavior to let block only be selectable to repair if correct context
+        // For CoroUtil's ItemRepairingGel:
+        // special behavior to let block only be selectable to repair if correct context
         if (Minecraft.getMinecraft().player != null 
                 // && (!Minecraft.getMinecraft().player.isSneaking()
                 && Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemRepairingGel)
                 ) {
             return AABB;
-        } else
-        */ {
+        } 
+        else {
             return NO_COLLIDE_AABB;
         }
+        */
+    	return NO_COLLIDE_AABB;
     }
 
     /**
@@ -161,17 +155,8 @@ public class BlockRepairingBlock  extends BlockContainer
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos,
                                             EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
                                             EntityLivingBase placer) {
-        //worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
         return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
-
-    /*
-    @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-        //super.onBlockAdded(worldIn, pos, state);
-        worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
-    }
-    */
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {

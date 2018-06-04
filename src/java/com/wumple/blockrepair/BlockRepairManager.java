@@ -29,15 +29,18 @@ public class BlockRepairManager
     	MinecraftForge.EVENT_BUS.register(this);
     }
     
-    public BlockBlank BlockBlankFactory() {
+    // override if using a different BlankBlock class
+    protected BlockBlank BlockBlankFactory() {
     	return new BlockBlank(Material.AIR);
     }
     
-    public BlockRepairingBlock BlockRepairingBlockFactory() {
+    // override if using a different BlockRepairingBlock class
+    protected BlockRepairingBlock BlockRepairingBlockFactory() {
     	return new BlockRepairingBlock();
     }
     
-    public Class TileEntityRepairingBlockClass() {
+    // override if usig a different TileEntityRepairingBlock class
+    protected Class TileEntityRepairingBlockClass() {
     	return TileEntityRepairingBlock.class;
 	}
     
@@ -57,20 +60,20 @@ public class BlockRepairManager
         addItemBlock(event, new ItemBlock(blockRepairingBlock).setRegistryName(blockRepairingBlock.getRegistryName()));
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName) {
+    protected void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName) {
         addBlock(event, block, tEnt, unlocalizedName, true);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName, boolean creativeTab) {
+    protected void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName, boolean creativeTab) {
         addBlock(event, block, unlocalizedName, creativeTab);
         GameRegistry.registerTileEntity(tEnt, unlocalizedName);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName) {
+    protected void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName) {
         addBlock(event, parBlock, unlocalizedName, true);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
+    protected void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
         parBlock.setUnlocalizedName(getNameUnlocalized(unlocalizedName));
         parBlock.setRegistryName(getNameDomained(unlocalizedName));
 
@@ -81,11 +84,11 @@ public class BlockRepairManager
         }
     }
 
-    public void addItemBlock(RegistryEvent.Register<Item> event, Item item) {
+    protected void addItemBlock(RegistryEvent.Register<Item> event, Item item) {
         event.getRegistry().register(item);
     }
 
-    public void addItem(RegistryEvent.Register<Item> event, Item item, String name) {
+    protected void addItem(RegistryEvent.Register<Item> event, Item item, String name) {
         item.setUnlocalizedName(getNameUnlocalized(name));
         item.setRegistryName(getNameDomained(name));
 
@@ -107,10 +110,6 @@ public class BlockRepairManager
     /*
      * Place repair block methods
      */
-    
-    public TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos) {
-        return replaceBlockAndBackup(world, pos, 20*60*5);
-    }
 
     /**
      *
@@ -119,7 +118,7 @@ public class BlockRepairManager
      * @param world
      * @param pos
      */
-    public TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos, int ticksToRepair) {
+    protected TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos, int ticksToRepair) {
         IBlockState oldState = world.getBlockState(pos);
         float oldHardness = oldState.getBlockHardness(world, pos);
         float oldExplosionResistance = 1;
@@ -135,7 +134,7 @@ public class BlockRepairManager
             //IBlockState state = world.getBlockState(pos);
             BlockRepair.logger.debug("set repairing block for pos: " + pos + ", " + oldState.getBlock());
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
-            repairing.setBlockData(oldState);
+            repairing.setOrig_blockState(oldState);
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
             repairing.setTicksToRepair(world, ticksToRepair);
@@ -145,9 +144,17 @@ public class BlockRepairManager
             return null;
         }
     }
+    
+    protected boolean canConvertToRepairingBlock(World world, IBlockState state) {
+		//should cover most all types we dont want to put into repairing state
+		if (!state.isFullCube()) {
+			return false;
+		}
+		return true;
+	}
 
     public boolean replaceBlock(World world, IBlockState state, BlockPos pos, int ticks) {
-    	if (!BlockRepairingBlock.canConvertToRepairingBlock(world, state)) {
+    	if (!canConvertToRepairingBlock(world, state)) {
     		BlockRepair.logger.info("cant use repairing block on: " + state);
     		return false;
     	}
