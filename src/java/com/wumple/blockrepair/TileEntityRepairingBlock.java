@@ -1,5 +1,7 @@
 package com.wumple.blockrepair;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 /*
@@ -13,6 +15,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -23,34 +26,79 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
 {
 	// block state to restore later
 	protected IBlockState orig_blockState;
+	
+	// cached values of original block to use for this tile entity's block
     protected float orig_hardness = 1;
     protected float orig_explosionResistance = 1;
     
     // when to restore state
     protected long timeToRepairAt = 0;
-        
-    protected static boolean useLoggingDebug() {
-    	return false;
+            
+    public void setTicksToRepair(World world, int ticksToRepair) {
+    	this.timeToRepairAt = world.getTotalWorldTime() + ticksToRepair;
     }
-    
-    public boolean canRepairBlock() {
+   
+    // override to change behavior when determining if block is repairable now
+    protected boolean canRepairBlock() {
+    	// don't repair now if any Entity's are in our bounds 
         AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
         aabb = aabb.offset(this.getPos());
         List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
         return (listTest.size() == 0);
     }
 
-    public void onCantRepairBlock() {
-    	
+    // override to change behavior when a block can't be repaired now (aka canRepairBlock() returned false)
+    protected void onCantRepairBlock() {
+    	// do nothing by default
+    	// override to change behavior
     }
-    
+        
+    // override to change behavior after a block is restored
+    protected void postRestoreBlock() {
+        //try to untrigger leaf decay for those large trees too far from wood source//also undo it for neighbors around it
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos posFix = pos.add(x, y, z);
+                    IBlockState state = world.getBlockState(posFix);
+                    if (state.getBlock() instanceof BlockLeaves) {
+                        try {
+                        	BlockRepair.logger.debug("restoring leaf to non decay state at pos: " + posFix);
+                        	// modify just the CHECK_DECAY property, leaving the rest as-is
+                            world.setBlockState(posFix, state.withProperty(BlockLeaves.CHECK_DECAY, false), 4);
+                        } catch (Exception ex) {
+                            //must be a modded block that doesn't use decay
+                        	boolean debugEnabled = BlockRepair.logger.isDebugEnabled();
+                        	if (debugEnabled) {
+	                        	// debug log stack trace
+	                        	StringWriter sw = new StringWriter();
+	                        	PrintWriter pw = new PrintWriter(sw);
+	                        	ex.printStackTrace(pw);
+	                        	String sStackTrace = sw.toString(); // stack trace as a string
+	                        		
+	                        	BlockRepair.logger.debug("Assume modded block not using decay: " + sStackTrace);
+                        	}
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // override to change behavior to restore a block (after canRestoreBlock() returns true)
+    protected void restoreBlock() {
+    	BlockRepair.logger.debug("restoring block to state: " + orig_blockState + " at " + this.getPos());
+        getWorld().setBlockState(this.getPos(), orig_blockState);
+        postRestoreBlock();
+    }
+
+    // implements ITickable
     @Override
     public void update()
     {
     	if (!getWorld().isRemote) {
     		
     	 	if (getWorld().getTotalWorldTime() >= timeToRepairAt) {
-    	 		
     	 	
             //if for some reason data is invalid, remove block
     	 		if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
@@ -69,60 +117,35 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     	}
     }
     
+    /*
     @Override
     public void onLoad() {
         super.onLoad();
 
         //i dont currently see any clean ways to init the tile entity with the orig_blockState before onLoad is called, so we cant do this here
-        /*if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
-            getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
-        }*/
-    }
-    
-    protected void postRestoreBlock() {
-        //try to untrigger leaf decay for those large trees too far from wood source//also undo it for neighbors around it
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos posFix = pos.add(x, y, z);
-                    IBlockState state = world.getBlockState(posFix);
-                    if (state.getBlock() instanceof BlockLeaves) {
-                        try {
-                        	BlockRepair.logger.debug("restoring leaf to non decay state at pos: " + posFix);
-                            world.setBlockState(posFix, state.withProperty(BlockLeaves.CHECK_DECAY, false), 4);
-                        } catch (Exception ex) {
-                            //must be a modded block that doesnt use decay
-                            if (useLoggingDebug()) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
+        //if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
+        //    getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
         }
     }
-	
-    public void restoreBlock() {
-    	BlockRepair.logger.debug("restoring block to state: " + orig_blockState + " at " + this.getPos());
-        getWorld().setBlockState(this.getPos(), orig_blockState);
-        postRestoreBlock();
-    }
+    */
 
-    public void setBlockData(IBlockState state) {
-        this.orig_blockState = state;
-    }
-
-    public IBlockState getOrig_blockState() {
-        return orig_blockState;
-    }
+    
+    /*
+     * Read and write additional NBT data
+     */
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound var1)
     {
-        if (orig_blockState != null) {
+        if (orig_blockState != null) {        	
             String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
             var1.setString("orig_blockName", str);
-            var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
+            
+    		NBTTagCompound stateNBT = new NBTTagCompound();
+    		NBTUtil.writeBlockState(stateNBT, this.orig_blockState);
+    		var1.setTag("orig_blockState2", stateNBT);
+
+            //var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
         }
         var1.setLong("timeToRepairAt", timeToRepairAt);
 
@@ -140,8 +163,9 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         try {
             Block block = Block.getBlockFromName(var1.getString("orig_blockName"));
             if (block != null) {
-                int meta = var1.getInteger("orig_blockMeta");
-                this.orig_blockState = block.getStateFromMeta(meta);
+                //int meta = var1.getInteger("orig_blockMeta");
+                //this.orig_blockState = block.getStateFromMeta(meta);
+                this.orig_blockState = NBTUtil.readBlockState(var1.getCompoundTag("orig_blockState2"));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -153,11 +177,18 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         orig_explosionResistance = var1.getFloat("orig_explosionResistance");
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
+    /*
+     * Original block (to repair) data accessors
+     */
+    
+    public void setOrig_blockState(IBlockState state) {
+        this.orig_blockState = state;
     }
 
+    public IBlockState getOrig_blockState() {
+        return orig_blockState;
+    }
+    
     public float getOrig_hardness() {
         return orig_hardness;
     }
@@ -172,9 +203,5 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
 
     public void setOrig_explosionResistance(float orig_explosionResistance) {
         this.orig_explosionResistance = orig_explosionResistance;
-    }
-    
-    public void setTicksToRepair(World world, int ticksToRepair) {
-    	this.timeToRepairAt = world.getTotalWorldTime() + ticksToRepair;
     }
 }
