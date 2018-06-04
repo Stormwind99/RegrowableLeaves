@@ -46,5 +46,6 @@ public class TileEntityLeavesRepairingBlock extends TileEntityRepairingBlock {
     	super.onCantRepairBlock();
     	// try again later
     	setTicksToRepair(getWorld(), LeavesRepairManager.getRandomTicksToRepair());
+    	markDirty();
     }
 }

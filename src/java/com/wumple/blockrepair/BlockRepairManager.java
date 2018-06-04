@@ -134,10 +134,7 @@ public class BlockRepairManager
             //IBlockState state = world.getBlockState(pos);
             BlockRepair.logger.debug("set repairing block for pos: " + pos + ", " + oldState.getBlock());
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
-            repairing.setOrig_blockState(oldState);
-            repairing.setOrig_hardness(oldHardness);
-            repairing.setOrig_explosionResistance(oldExplosionResistance);
-            repairing.setTicksToRepair(world, ticksToRepair);
+            repairing.init(world, ticksToRepair, oldState, oldHardness, oldExplosionResistance);
             return repairing;
         } else {
         	BlockRepair.logger.debug("failed to set repairing block for pos: " + pos);
