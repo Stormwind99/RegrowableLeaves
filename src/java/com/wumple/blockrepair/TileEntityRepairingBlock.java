@@ -1,7 +1,6 @@
 package com.wumple.blockrepair;
 
 import java.util.List;
-import java.util.Random;
 
 /*
  * Based on CoroUtil's TileEntityRepairingBlock

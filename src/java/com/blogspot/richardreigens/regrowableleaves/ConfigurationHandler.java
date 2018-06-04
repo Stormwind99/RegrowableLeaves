@@ -9,9 +9,6 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-/**
- * Created by LiLRichy on 12/26/2015.
- */
 @Config(modid = Reference.MOD_ID)
 public class ConfigurationHandler
 {
