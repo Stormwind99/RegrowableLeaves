@@ -9,8 +9,6 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.google.common.reflect.TypeToken;
-
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
