@@ -48,4 +48,9 @@ public class EventHandler {
         }
     }
     
+    /*
+     * Consider handling explosionEvent and repairing any leaves (assuming tree survives)
+     * See CoroUtil.forge.EventHandlerForge#explosionEvent for example
+     */
+    
 }
