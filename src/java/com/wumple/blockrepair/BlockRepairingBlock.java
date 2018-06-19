@@ -95,7 +95,7 @@ public class BlockRepairingBlock  extends BlockContainer
     @Override
     public boolean isFullCube(IBlockState state)
     {
-        return false;/*super.isFullCube(state);*/
+        return false;
     }   
      
     @Override
@@ -107,6 +107,7 @@ public class BlockRepairingBlock  extends BlockContainer
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state)
     {
+    	// hint: if not in debug mode, return EnumBlockRenderType.INVISIBLE
         return EnumBlockRenderType.MODEL;
     }
 
@@ -143,7 +144,6 @@ public class BlockRepairingBlock  extends BlockContainer
     @Override
     public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
         //deny from happening
-        //super.onBlockExploded(world, pos, explosion);
     }
 
     @Override
