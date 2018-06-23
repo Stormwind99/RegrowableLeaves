@@ -30,7 +30,6 @@ public class regrowableleaves {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        isBOPInstalled = Loader.isModLoaded("BiomesOPlenty");
         MinecraftForge.EVENT_BUS.register(new com.blogspot.richardreigens.regrowableleaves.EventHandler());
     }
 }
